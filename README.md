@@ -1,5 +1,5 @@
 # dCache
-## by Chloe Scaramal
+**by Chloe Scaramal**
 
 ### distributed cache system for in-memory storage of key-value objects.
 
