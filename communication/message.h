@@ -5,7 +5,7 @@ typedef struct message {
     char type;
     char id[11];
     char key[17];
-    char data[];
+    char* data;
 } Message;
 
 Message createMessage(char type, char id[], char key[], char data[]);

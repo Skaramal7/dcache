@@ -6,7 +6,7 @@
 typedef struct message message;
 
 int main() {
-    Message msg = createMessage('a', "safsaf", "object", "2-10tjg-sdgidnsdajo");
+    Message msg = createMessage('a', "safsafffaa", "object", "2-10tjg-sdgidnsdajo");
 
     return 0;
 }
