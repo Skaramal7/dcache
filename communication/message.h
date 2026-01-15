@@ -1,12 +1,17 @@
 #ifndef DCACHE_MESSAGE_H
 #define DCACHE_MESSAGE_H
 
-struct message;
+typedef struct message {
+    char type;
+    char id[11];
+    char key[17];
+    char data[];
+} Message;
 
-struct message createMessage(char type, char id[], char key[], char data[]);
+Message createMessage(char type, char id[], char key[], char data[]);
 
-char* buildMessage(struct message m);
+char* buildMessage(Message m);
 
-struct message unwindMessage(char* m);
+Message unwindMessage(char* m);
 
 #endif

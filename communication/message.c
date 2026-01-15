@@ -1,17 +1,9 @@
 #include"message.h"
-
 #include <stdlib.h>
 #include<string.h>
 
-struct message {
-    char type;
-    char id[11];
-    char key[17];
-    char data[];
-};
-
-struct message createMessage(char type, char id[], char key[], char data[]) {
-    struct message msg;
+Message createMessage(char type, char id[], char key[], char data[]) {
+    Message msg;
 
     msg.type = type;
     strcpy(msg.id, id);
@@ -21,7 +13,7 @@ struct message createMessage(char type, char id[], char key[], char data[]) {
     return msg;
 }
 
-char* buildMessage(struct message m) {
+char* buildMessage(Message m) {
     char* msg = strcat(&m.type, m.id);
     strcat(msg, m.key);
     strcat(msg, m.data);
@@ -29,8 +21,8 @@ char* buildMessage(struct message m) {
     return msg;
 }
 
-struct message unwindMessage(char* m) {
-    struct message msg;
+Message unwindMessage(char* m) {
+    Message msg;
 
     msg.type = m[0];
 
