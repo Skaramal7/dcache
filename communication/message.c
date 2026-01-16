@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include<string.h>
 
-#define STR_PADDING = '#'
+#define STR_PADDING '#'
 
-Message createMessage(char type, char id[], char key[], char data[]) {
+Message createMessage(char type, char id[], char key[], char data[]) {              // recieves strings and returns an Message object with a valid type if successful and with '0' type if not
     Message msg;
     char paddedString[17];
 
@@ -35,20 +35,33 @@ Message createMessage(char type, char id[], char key[], char data[]) {
             paddedString[16] = '\0';
 
             for(int i = 0; i < paddingsize; i++) {
-                paddedString[i] = '#';
+                paddedString[i] = STR_PADDING;
             }
-
+        }
+        for (int i = 0; i < 17; i++) {
+            msg.key[i] = paddedString[i];
         }
     }
-    strcpy(msg.key, key);
 
+    msg.data = (char *) malloc((strlen(data) + 1) * sizeof(char));
+    if(msg.data == NULL) {
+        msg.type = '0';
+        return msg;
+    }
     strcpy(msg.data, data);
 
     return msg;
 }
 
 char* buildMessage(Message m) {
-    char* msg = strcat(&m.type, m.id);
+    int total_size = 1 + 10 + 16 + strlen(m.data) + 1;
+
+    char* msg = (char *) malloc(total_size * sizeof(char));
+    if (msg == NULL) return NULL;
+
+    msg[0] = m.type;
+    msg[1] = '\0';
+    strcat(msg, m.id);
     strcat(msg, m.key);
     strcat(msg, m.data);
 
@@ -60,33 +73,29 @@ Message unwindMessage(char* m) {
 
     msg.type = m[0];
 
-    char id[11] = "";
-    for (int i = 1; i <= 10; i++) {
-        id[i-1] = m[i];
-    }
-    strcpy(msg.id, id);
+    strncpy(msg.id, &m[1], 10);
+    msg.id[10] = '\0';
 
-    char key[17] = "";
-    for (int i = 11; i <= 26; i++) {
-        key[i-11] = m[i];
-    }
-    strcpy(msg.key, key);
-
-    char* data = (char *) malloc(sizeof(char));
-    for (int i = 27; m[i] != '\0'; i++) {
-        data = realloc(data, (i-25) * sizeof(char));
-        if (data == NULL) {
+    int key_pos;
+    for (int i = 11; i < 27; i++) {
+        if (m[i] == STR_PADDING)
+            continue;
+        else {
+            key_pos = i;
             break;
         }
-        data[i-27] = m[i];
     }
+    int key_len = 16 - (key_pos - 11);
+    strncpy(msg.key, &m[key_pos], key_len);
+    msg.key[key_len] = '\0';
 
-    free(data);
-    strcpy(msg.data, data);
+    int data_len = strlen(&m[27]);
+    msg.data = (char *) malloc((data_len + 1) * sizeof(char));
+    if (msg.data == NULL) {
+        msg.type = '0';
+        return msg;
+    }
+    strcpy(msg.data, &m[27]);
 
     return msg;
-}
-
-int main () {
-    Message msg = createMessage('a', "safsafffaa", "object", "2-10tjg-sdgidnsdajo");
 }

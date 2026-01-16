@@ -1,3 +1,4 @@
+#include"communication/message.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -12,7 +13,7 @@ int main(){
 
   struct sockaddr_in address;
   address.sin_family = AF_INET;
-  address.sin_port = htons(8080); // Port 8080
+  address.sin_port = htons(8080);
   address.sin_addr.s_addr = INADDR_ANY;
 
   // Bind serverSocket to address
