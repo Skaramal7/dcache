@@ -12,12 +12,11 @@ int main() {
 
     struct sockaddr_in address;
     address.sin_family = AF_INET;
-    address.sin_port = htons(8080);
+    address.sin_port = htons(9001);
 
-    // Set address to your computer's local address
     inet_aton("127.0.0.1", (struct in_addr *) &(address.sin_addr.s_addr));
 
-    // Establish a connection to address on client_socket
+    // connect to client_socket
     connect(clientSocket, (struct sockaddr *) &address, sizeof(address));
 
 
@@ -27,6 +26,7 @@ int main() {
     char any;
     scanf("%s", &any); // stop so it doesnt run automatically for testing
 
+    printf("sending message: %s\n", message);
     send(clientSocket, message, strlen(message), 0);
 
     // Close the connection

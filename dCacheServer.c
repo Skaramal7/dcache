@@ -7,13 +7,21 @@
 #include <sys/types.h>
 #include <arpa/inet.h>
 
+int set(char key[], char object[]) {}
+
+char* get(char key[]) {}
+
+int delete(char key[]) {}
+
+int flush(char key[]) {}
+
 int main(){
   int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 
 
   struct sockaddr_in address;
   address.sin_family = AF_INET;
-  address.sin_port = htons(8080);
+  address.sin_port = htons(9001);
   address.sin_addr.s_addr = INADDR_ANY;
 
   // Bind serverSocket to address
@@ -29,6 +37,7 @@ int main(){
   char message[256];
   memset(message, 0, 256);
 
+  printf("waiting for message...\n");
   recv(clientSocket, message, 255, 0);
 
   // Close the client socket
