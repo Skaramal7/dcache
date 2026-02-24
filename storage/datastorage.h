@@ -14,15 +14,15 @@ struct clientEntry {
 };
 typedef struct clientEntry ClientEntry;
 
-ClientEntry* initStorage(int bucketsNum);                                                         // returns empty array of ClientEntry ready for use
+ClientEntry* initStorage(int bucketsNum);                                           // returns empty array of ClientEntry ready for use
 
-int freeStorage(ClientEntry* clientArray);                                          // frees all storage on clientArray; returns 0 for success
+int freeStorage(ClientEntry* clientArray, int bucketsNum);                                          // frees all storage on clientArray; returns 0 for success
 
-int insertClient(ClientEntry* clientArray, char* clientId);                         // inserts clientId in clientArray by hashing its ID; returns 0 for success, 2 if client already exists
+int insertClient(ClientEntry* clientArray, char* clientId, int bucketsNum);                         // inserts clientId in clientArray by hashing its ID; returns 0 for success, 2 if client already exists
 
 int removeClient(ClientEntry* clientArray, char* clientId);                         // removes clientId in clientArray
 
-int storeObject(ClientEntry* clientArray, char* clientId, char* key, char* data);   // stores new object with key in clientId; returns 0 for success, 2 if object already exists
+int storeObject(ClientEntry* clientArray, char* clientId, char* key, char* data, int bucketsNum);   // stores new object with key in clientId; returns 0 for success, 2 if object already exists
 
 int deleteObject(ClientEntry* clientArray, char* clientId, char* key);              // deletes object with key from clientId's list
 
