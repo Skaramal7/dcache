@@ -18,16 +18,16 @@ ClientEntry* initStorage(int bucketsNum);                                       
 
 int freeStorage(ClientEntry* clientArray, int bucketsNum);                                          // frees all storage on clientArray; returns 0 for success
 
-int insertClient(ClientEntry* clientArray, char* clientId, int bucketsNum);                         // inserts clientId in clientArray by hashing its ID; returns 0 for success, 2 if client already exists
+//int insertClient(ClientEntry* clientArray, char* clientId, int bucketsNum);                         // inserts clientId in clientArray by hashing its ID; returns 0 for success, 2 if client already exists
 
-int removeClient(ClientEntry* clientArray, char* clientId);                         // removes clientId in clientArray
+//int removeClient(ClientEntry* clientArray, char* clientId);                         // removes clientId in clientArray
 
 int storeObject(ClientEntry* clientArray, char* clientId, char* key, char* data, int bucketsNum);   // stores new object with key in clientId; returns 0 for success, 2 if object already exists
 
-int deleteObject(ClientEntry* clientArray, char* clientId, char* key);              // deletes object with key from clientId's list
+int deleteObject(ClientEntry* clientArray, char* clientId, char* key, int bucketsNum);              // deletes object with key from clientId's list
 
 int hashClientId(char* clientId, int bucketsNum);                                                     // returns hashed array position for given clientId
 
-char* buildClientId(char* ipaddr, char* portnum);                                   // returns given ip address and port number into a formatted id
+const char* buildClientId(char* ipaddr, char* portnum);                                   // returns given ip address and port number into a formatted id
 
 #endif

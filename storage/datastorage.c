@@ -25,13 +25,6 @@ int freeStorage(ClientEntry* clientArray, int bucketsNum) {
     return 0;
 }
 
-int insertClient(ClientEntry* clientArray, char* clientId, int bucketsNum) {
-    int index = hashClientId(clientId, bucketsNum);
-    clientArray[index].clientId = clientId;
-    clientArray[index].objectList = NULL;
-    return 0;
-}
-
 int storeObject(ClientEntry* clientArray, char* clientId, char* key, char* data, int bucketsNum) {
     int index = hashClientId(clientId, bucketsNum);
 
@@ -88,6 +81,51 @@ int storeObject(ClientEntry* clientArray, char* clientId, char* key, char* data,
     }
 }
 
+int deleteObject(ClientEntry* clientArray, char* clientId, char* key, int bucketsNum) {
+    int index = hashClientId(clientId, bucketsNum);
+
+    if (strcmp(clientArray[index].clientId, clientId) == 0) {
+        if (strcmp(clientArray[index].objectList->key, key) == 0) {
+            ObjectNode* node = clientArray[index].objectList;
+            clientArray[index].objectList = clientArray[index].objectList->next;
+            free(node);
+            return 0;
+        } else {
+            ObjectNode* lastNode = clientArray[index].objectList;
+            for(ObjectNode* node = clientArray[index].objectList->next; node != NULL; node = node->next) {
+                if(strcmp(node->key, key) == 0) {
+                    lastNode->next = node->next;
+                    free(node);
+                    return 0;
+                }
+            }
+        }
+        return 1;
+    } else {
+        for(int i = index + 1; i < bucketsNum; i++) {
+            if (strcmp(clientArray[i].clientId, clientId) == 0) {
+                if (strcmp(clientArray[i].objectList->key, key) == 0) {
+                    ObjectNode* node = clientArray[i].objectList;
+                    clientArray[i].objectList = clientArray[i].objectList->next;
+                    free(node);
+                    return 0;
+                } else {
+                    ObjectNode* lastNode = clientArray[i].objectList;
+                    for(ObjectNode* node = clientArray[i].objectList->next; node != NULL; node = node->next) {
+                        if(strcmp(node->key, key) == 0) {
+                            lastNode->next = node->next;
+                            free(node);
+                            return 0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return 1;
+}
+
 int hashClientId(char* clientId, int bucketsNum) {
     int keyLength = strlen(clientId);
     char* half1 = (char *) malloc(sizeof(char));
@@ -108,6 +146,20 @@ int hashClientId(char* clientId, int bucketsNum) {
     return index;
 }
 
-int main() {
-    int index = hashClientId("17769145414504", 200);
+const char* buildClientId(char* ipaddr, char* portnum) {
+    char pr[16], *resultString, *pw;
+    resultString = (char *) malloc(18 * sizeof(char));
+    strcpy(pr, ipaddr);
+
+    pw = resultString;
+    for (int i = 0; i < 16; i++) {
+        if (pr[i] != '.') {
+            *pw = pr[i];
+            pw++;
+            if (pr[i] == '\0') break;
+        }
+    }
+
+    strcat(resultString, portnum);
+    return resultString;
 }
