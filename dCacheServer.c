@@ -60,6 +60,7 @@ int main(){
       switch (rcvdmsg.type) {
         case 'a':
           storeObject(clientArray, clientId, rcvdmsg.key, rcvdmsg.data, BUCKETSNUM);
+          printf("stored object \'%s\'", rcvdmsg.key);
           //char* sendmsg = buildMessage(createMessage('a', rcvdmsg.id, rcvdmsg.key, ""));  //acknowledge msg sending - not implemented yet
           break;
 

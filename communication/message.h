@@ -8,6 +8,13 @@ typedef struct message {
     char* data;
 } Message;
 
+typedef struct dCacheServer
+{
+    int lastId;
+    char ipaddr[16];
+    char portnum[6];
+} DCacheServer;
+
 Message createMessage(char type, char id[], char key[], char data[]);
 
 char* buildMessage(Message m);
