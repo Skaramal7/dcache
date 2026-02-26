@@ -32,19 +32,20 @@ int main(){
   // listening for clients
   listen(serverSocket, MAX_QUEUE);
   printf("Server listening on port %d...\n", PORT);
+  if ((clientSocket = accept(serverSocket, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0) {
+    perror("accept failed");
+    exit(1);
+  }
+  printf("connection established...\n");
 
   while (1) {
-    if ((clientSocket = accept(serverSocket, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0) {
-      perror("accept failed");
-      exit(1);
-    }
-    printf("connection established...\n");
 
     int valread = read(clientSocket, buffer, BUFFER_SIZE);
     if (valread > 0) {
+      buffer[valread] = '\0';
       struct sockaddr_in peerAddr;
       socklen_t peerAddrlen = sizeof(peerAddr);
-      char *clientIp, clientPort[6];
+      char clientIp[16], clientPort[6];
 
       if (getpeername(clientSocket, (struct sockaddr*)&peerAddr, &peerAddrlen) == 0) {
         strcpy(clientIp, inet_ntoa(peerAddr.sin_addr));
@@ -60,7 +61,7 @@ int main(){
       switch (rcvdmsg.type) {
         case 'a':
           storeObject(clientArray, clientId, rcvdmsg.key, rcvdmsg.data, BUCKETSNUM);
-          printf("stored object \'%s\'", rcvdmsg.key);
+          printf("\nstored object '%s'", rcvdmsg.key);
           //char* sendmsg = buildMessage(createMessage('a', rcvdmsg.id, rcvdmsg.key, ""));  //acknowledge msg sending - not implemented yet
           break;
 
@@ -91,7 +92,6 @@ int main(){
       perror("read error");
     }
 
-    close(clientSocket);
     memset(buffer, 0, BUFFER_SIZE);
   }
 
