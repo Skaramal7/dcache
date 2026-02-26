@@ -12,27 +12,25 @@
 
 int main() {
     printf("\n\nInitializing dCache client...\n");
-    int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
-    struct sockaddr_in address;
-    address.sin_family = AF_INET;
-    address.sin_port = htons(9095);
-    char buffer[BUFFER_SIZE] = {0};
 
-    char serverIp[16];
-        printf("Server IP address: ");
-        scanf("%s", serverIp);
     Message lastMessage = {'\0', "", "", ""};
-
-    inet_aton("127.0.0.1", (struct in_addr *) &(address.sin_addr.s_addr));
-
     char keyBuffer[17];
     char dataBuffer[513];
-    int len;                // read string len
+    int len, numId;                // read string len
     char sendmsg[BUFFER_SIZE];
     Message rcvdmsg;
     Message newMsg;
     char newId[12];
+    int serverSocket;
+    struct sockaddr_in address;
+    address.sin_family = AF_INET;
+    address.sin_port = htons(9095);
+    char buffer[BUFFER_SIZE] = {0};
+    char yn;
 
+    inet_aton("127.0.0.1", (struct in_addr *) &(address.sin_addr.s_addr));
+
+    serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     connect(serverSocket, (struct sockaddr *) &address, sizeof(address));
 
     while (1) {
@@ -42,10 +40,9 @@ int main() {
         printf("\n1. Set object\n2. Get object\n3. Flush data\n4. Exit.\nOption: ");
         scanf("%d", &opt); getchar();
 
-        switch (opt)
-        {
+        switch (opt){
             case 1:
-                printf("\nObject key (max 16): ");
+                printf("Object key (max 16): ");
                 fgets(keyBuffer, sizeof(keyBuffer), stdin);
                 len = strlen(keyBuffer);
                 if (len > 0 && keyBuffer[len - 1] == '\n') {
@@ -65,20 +62,19 @@ int main() {
                     send(serverSocket, sendmsg, strlen(sendmsg), 0);
                     lastMessage = newMsg;
                 } else {
-                    int numId = atoi(lastMessage.id);
+                    numId = atoi(lastMessage.id);
                     numId++;
                     snprintf(newId, sizeof(newId), "%010d", numId);
                     newMsg = createMessage('a', newId, keyBuffer, dataBuffer);
                     strcpy(sendmsg, buildMessage(newMsg));
                     send(serverSocket, sendmsg, strlen(sendmsg), 0);
                     lastMessage = newMsg;
-                    printf("%s, %s, %s", newMsg.id, newMsg.key, newMsg.data);
                 }
                 break;
 
             case 2:
-                printf("\nObject key (max 16): ");
-                scanf("%s", keyBuffer);
+                printf("Object key (max 16): ");
+                scanf("%16s", keyBuffer);
                 len = strlen(keyBuffer);
                 if (len > 0 && keyBuffer[len - 1] == '\n') {
                     keyBuffer[len - 1] = '\0';
@@ -90,10 +86,10 @@ int main() {
                     send(serverSocket, sendmsg, strlen(sendmsg), 0);
                     lastMessage = newMsg;
                 } else {
-                    int numId = atoi(lastMessage.id);
+                    numId = atoi(lastMessage.id);
                     numId++;
                     snprintf(newId, sizeof(newId), "%010d", numId);
-                    newMsg = createMessage('a', newId, keyBuffer, "");
+                    newMsg = createMessage('b', newId, keyBuffer, "");
                     strcpy(sendmsg, buildMessage(newMsg));
                     send(serverSocket, sendmsg, strlen(sendmsg), 0);
                     lastMessage = newMsg;
@@ -107,6 +103,51 @@ int main() {
                 } else {
                     printf("Unable to get data... ");
                 }
+                break;
+
+            case 3:
+                printf("This will erase ALL data, do you wish to continue? (Y/N) "); scanf("%c", &yn);
+                if (yn == 'Y') {
+                    if (strcmp(lastMessage.id, "") == 0) {
+                        newMsg = createMessage('z', "0000000001", "", "");
+                        strcpy(sendmsg, buildMessage(newMsg));
+                        send(serverSocket, sendmsg, strlen(sendmsg), 0);
+                        lastMessage = newMsg;
+                    } else {
+                        numId = atoi(lastMessage.id);
+                        numId++;
+                        snprintf(newId, sizeof(newId), "%010d", numId);
+                        newMsg = createMessage('z', newId, "", "");
+                        strcpy(sendmsg, buildMessage(newMsg));
+                        send(serverSocket, sendmsg, strlen(sendmsg), 0);
+                        lastMessage = newMsg;
+                    }
+                } else
+                {
+                    printf("Flush cancelled.\n");
+                }
+                break;
+
+            case 4:
+            if (strcmp(lastMessage.id, "") == 0) {
+                newMsg = createMessage('z', "0000000001", "", "");
+                strcpy(sendmsg, buildMessage(newMsg));
+                send(serverSocket, sendmsg, strlen(sendmsg), 0);
+                lastMessage = newMsg;
+            } else {
+                numId = atoi(lastMessage.id);
+                numId++;
+                snprintf(newId, sizeof(newId), "%010d", numId);
+                newMsg = createMessage('z', newId, "", "");
+                strcpy(sendmsg, buildMessage(newMsg));
+                send(serverSocket, sendmsg, strlen(sendmsg), 0);
+                lastMessage = newMsg;
+            }
+            close(serverSocket);
+            exit(0);
+
+            default:
+                printf("Invalid option.\n");
                 break;
         }
     }

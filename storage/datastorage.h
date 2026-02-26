@@ -22,7 +22,7 @@ int freeStorage(ClientEntry* clientArray, int bucketsNum);                      
 
 //int removeClient(ClientEntry* clientArray, char* clientId);                         // removes clientId in clientArray
 
-int storeObject(ClientEntry* clientArray, char* clientId, char* key, char* data, int bucketsNum);   // stores new object with key in clientId; returns 0 for success, 2 if object already exists
+int storeObject(ClientEntry *clientArray, char* clientId, char* key, char* data, int bucketsNum);   // stores new object with key in clientId; returns 0 for success, 2 if object already exists
 
 int deleteObject(ClientEntry* clientArray, char* clientId, char* key, int bucketsNum);              // deletes object with key from clientId's list
 

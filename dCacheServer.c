@@ -19,6 +19,7 @@ int main(){
   int serverSocket = socket(AF_INET, SOCK_STREAM, 0), clientSocket;
   char buffer[BUFFER_SIZE] = {0};
   ClientEntry clientArray[BUCKETSNUM];
+  char sendmsg[BUFFER_SIZE] = {0};
 
   struct sockaddr_in address;
   address.sin_family = AF_INET;
@@ -32,6 +33,7 @@ int main(){
   // listening for clients
   listen(serverSocket, MAX_QUEUE);
   printf("Server listening on port %d...\n", PORT);
+
   if ((clientSocket = accept(serverSocket, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0) {
     perror("accept failed");
     exit(1);
@@ -39,7 +41,6 @@ int main(){
   printf("connection established...\n");
 
   while (1) {
-
     int valread = read(clientSocket, buffer, BUFFER_SIZE);
     if (valread > 0) {
       buffer[valread] = '\0';
@@ -61,17 +62,18 @@ int main(){
       switch (rcvdmsg.type) {
         case 'a':
           storeObject(clientArray, clientId, rcvdmsg.key, rcvdmsg.data, BUCKETSNUM);
-          printf("\nstored object '%s'", rcvdmsg.key);
-          //char* sendmsg = buildMessage(createMessage('a', rcvdmsg.id, rcvdmsg.key, ""));  //acknowledge msg sending - not implemented yet
+          printf("stored object '%s'\n", rcvdmsg.key);
           break;
 
         case 'b':
           ObjectNode* node = getObject(clientId, rcvdmsg.key, clientArray);
           if (node == NULL) {
-            char* sendmsg = buildMessage(createMessage('b', rcvdmsg.id, rcvdmsg.key, ""));
-            send(clientSocket, sendmsg, strlen(sendmsg), 0);
+            strcpy(sendmsg, buildMessage(createMessage('b', rcvdmsg.id, rcvdmsg.key, "")));
+            printf("No object found.");
+          } else {
+            strcpy(sendmsg, buildMessage(createMessage('b', rcvdmsg.id, rcvdmsg.key, node->data)));
+            printf("Sending data...");
           }
-          char* sendmsg = buildMessage(createMessage('b', rcvdmsg.id, rcvdmsg.key, node->data));
           send(clientSocket, sendmsg, strlen(sendmsg), 0);
           break;
 
@@ -111,7 +113,7 @@ ObjectNode* getObject(char *clientId, char key[17], ClientEntry* clientArray) {
   } else {
     for (int i = index + 1; i < BUCKETSNUM; i++) {
       if (strcmp(clientArray[i].clientId, clientId) == 0) {
-        for (ObjectNode* node = clientArray[index].objectList; node != NULL; node = node->next) {
+        for (ObjectNode* node = clientArray[i].objectList; node != NULL; node = node->next) {
           if (strcmp(node->key, key) == 0) {
             return node;
           }
